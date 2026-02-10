@@ -1,0 +1,7 @@
+{
+  "name": "Warung Batachi PWA",
+  "description": "A premium, fast, and appetizing Progressive Web App for Warung Batachi, featuring home-cooked style meals with champion flavors.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

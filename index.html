@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="id" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Warung Batachi | Masakan Rumahan Rasa Juara</title>
+    
+    <!-- PWA Primary Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Batachi">
+    <meta name="theme-color" content="#121212">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://picsum.photos/192/192">
+    
+    <!-- SEO -->
+    <meta name="description" content="Warung Batachi menyajikan masakan rumahan dengan rasa juara yang bikin nagih. Pesan sekarang melalui APK Web kami.">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#A0522D', // Terracotta/Coklat Bata
+              secondary: '#D4AF37', // Gold/Emas
+              dark: '#121212',
+              glass: 'rgba(255, 255, 255, 0.05)',
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out forwards',
+              'bounce-slow': 'bounce 3s infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0', transform: 'translateY(20px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+      
+      body {
+        background-color: #121212;
+        color: white;
+        -webkit-tap-highlight-color: transparent;
+        overflow-x: hidden;
+        font-family: 'Inter', sans-serif;
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #121212;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #A0522D;
+      }
+
+      .glassmorphism {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .ios-safe-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      
+      section {
+        scroll-margin-top: 100px;
+      }
+
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      
+      .custom-scroll::-webkit-scrollbar {
+        width: 4px;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.1);
+        border-radius: 10px;
+      }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
+    <script>
+      // Register Service Worker for PWA functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker registered', reg))
+            .catch(err => console.log('Service Worker registration failed', err));
+        });
+      }
+    </script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
