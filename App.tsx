@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { MENU_ITEMS as INITIAL_MENU, INITIAL_CONFIG } from './constants';
 import { MenuItem, AppConfig, CartItem } from './types';
 
@@ -358,6 +358,213 @@ const Header: React.FC<{
   );
 };
 
+// --- HERO SLIDER COMPONENT ---
+const HeroSlider: React.FC<{ menuItems: MenuItem[] }> = ({ menuItems }) => {
+  const sliderRef = useRef<HTMLDivElement>(null);
+  const mainImageRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const descRef = useRef<HTMLDivElement>(null);
+  const counterRef = useRef<HTMLDivElement>(null);
+  
+  const [currentSlide, setCurrentSlide] = useState(1);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const lastScrollTime = useRef(0);
+  
+  const totalSlides = menuItems.length;
+
+  useEffect(() => {
+    if ((window as any).gsap && (window as any).CustomEase) {
+      (window as any).gsap.registerPlugin((window as any).CustomEase);
+    }
+  }, []);
+
+  const animateSlide = (direction: 'up' | 'down') => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+
+    const nextIdx = direction === 'down' 
+      ? (currentSlide === totalSlides ? 1 : currentSlide + 1)
+      : (currentSlide === 1 ? totalSlides : currentSlide - 1);
+
+    const nextItem = menuItems[nextIdx - 1];
+
+    const slider = sliderRef.current!;
+    const mainImgContainer = mainImageRef.current!;
+    const titleRefCurrent = titleRef.current!;
+    const descRefCurrent = descRef.current!;
+    const counterRefCurrent = counterRef.current!;
+
+    const currentSlideEl = slider.querySelector('.slide');
+    const currentMainWrapper = mainImgContainer.querySelector('.slide-main-img-wrapper');
+    const currentTitle = titleRefCurrent.querySelector('h1');
+    const currentDesc = descRefCurrent.querySelector('p');
+    const currentCounter = counterRefCurrent.querySelector('p');
+
+    const newSlide = document.createElement('div');
+    newSlide.className = 'slide';
+    newSlide.innerHTML = `<div class="slide-bg-img" style="clip-path: ${direction === 'down' ? 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)' : 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)'}"><img src="${nextItem.image}" alt="" /></div>`;
+    
+    const newMainWrapper = document.createElement('div');
+    newMainWrapper.className = 'slide-main-img-wrapper';
+    newMainWrapper.style.clipPath = direction === 'down' ? 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)' : 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)';
+    newMainWrapper.innerHTML = `<img src="${nextItem.image}" alt="" />`;
+
+    const newTitle = document.createElement('h1');
+    newTitle.textContent = nextItem.name;
+    // Menggunakan persentase agar selalu keluar dari viewport container tanpa peduli tinggi teks
+    (window as any).gsap.set(newTitle, { yPercent: direction === 'down' ? 100 : -100 });
+
+    const newDesc = document.createElement('p');
+    newDesc.textContent = nextItem.category;
+    (window as any).gsap.set(newDesc, { yPercent: direction === 'down' ? 100 : -100 });
+
+    const newCounter = document.createElement('p');
+    newCounter.textContent = nextIdx.toString();
+    (window as any).gsap.set(newCounter, { yPercent: direction === 'down' ? 100 : -100 });
+
+    slider.appendChild(newSlide);
+    mainImgContainer.appendChild(newMainWrapper);
+    titleRefCurrent.appendChild(newTitle);
+    descRefCurrent.appendChild(newDesc);
+    counterRefCurrent.appendChild(newCounter);
+
+    (window as any).gsap.set(newMainWrapper.querySelector('img'), {
+      y: direction === 'down' ? "-50%" : "50%"
+    });
+
+    const ease = ".87, 0, .13, 1";
+    const tl = (window as any).gsap.timeline({
+      onComplete: () => {
+        currentSlideEl?.remove();
+        currentMainWrapper?.remove();
+        currentTitle?.remove();
+        currentDesc?.remove();
+        currentCounter?.remove();
+        setCurrentSlide(nextIdx);
+        setIsAnimating(false);
+      }
+    });
+
+    tl.to(newSlide.querySelector('.slide-bg-img'), {
+      clipPath: direction === 'down' ? "polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)" : "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(currentSlideEl!.querySelector('img'), {
+      scale: 1.5,
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(newMainWrapper, {
+      clipPath: direction === 'down' ? "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)" : "polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)",
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(currentMainWrapper!.querySelector('img'), {
+      y: direction === 'down' ? "50%" : "-50%",
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(newMainWrapper.querySelector('img'), {
+      y: 0,
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(currentTitle, {
+      yPercent: direction === 'down' ? -100 : 100,
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(newTitle, {
+      yPercent: 0,
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(currentDesc, {
+      yPercent: direction === 'down' ? -100 : 100,
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(newDesc, {
+      yPercent: 0,
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(currentCounter, {
+      yPercent: direction === 'down' ? -100 : 100,
+      duration: 1.25,
+      ease: ease
+    }, 0)
+    .to(newCounter, {
+      yPercent: 0,
+      duration: 1.25,
+      ease: ease
+    }, 0);
+  };
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (window.scrollY > 100) return;
+      const now = Date.now();
+      if (now - lastScrollTime.current < 1000) return;
+      lastScrollTime.current = now;
+      const direction = e.deltaY > 0 ? 'down' : 'up';
+      animateSlide(direction);
+    };
+
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [currentSlide, isAnimating, menuItems]);
+
+  return (
+    <div id="home" className="slider-container" ref={sliderRef}>
+      <div className="slide">
+        <div className="slide-bg-img">
+          <img src={menuItems[0].image} alt="" />
+        </div>
+      </div>
+
+      <div className="slide-main-img" ref={mainImageRef}>
+        <div className="slide-main-img-wrapper">
+          <img src={menuItems[0].image} alt="" />
+        </div>
+      </div>
+
+      <div className="slide-copy">
+        <div className="slide-title" ref={titleRef}>
+          <h1>{menuItems[0].name}</h1>
+        </div>
+        <div className="slide-description" ref={descRef}>
+          <p>{menuItems[0].category}</p>
+        </div>
+        <button 
+          onClick={() => scrollToSection('menu')}
+          className="mt-6 md:mt-10 px-8 md:px-10 py-3 md:py-4 bg-secondary text-dark font-black uppercase text-[9px] md:text-[10px] tracking-[0.3em] rounded-full hover:scale-110 transition shadow-2xl"
+        >
+          Lihat Menu
+        </button>
+      </div>
+
+      <div className="slider-footer">
+        <div className="flex flex-col items-start gap-2">
+           <p className="text-[10px] font-black uppercase tracking-[0.5em] text-gray-500 italic">Signature Items</p>
+           <div className="slider-counter">
+              <div className="count" ref={counterRef}>
+                <p>{currentSlide}</p>
+              </div>
+              <p className="opacity-30 mx-2">/</p>
+              <p className="opacity-30">{totalSlides}</p>
+           </div>
+        </div>
+        <div className="hidden md:flex flex-col items-end opacity-20 italic">
+           <p className="text-[8px] font-black uppercase tracking-widest">Scroll / Swipe</p>
+           <p className="text-[8px] font-black uppercase tracking-widest">To Experience</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [config, setConfig] = useState<AppConfig>(INITIAL_CONFIG);
@@ -369,23 +576,18 @@ const App: React.FC = () => {
   const [filter, setFilter] = useState<'Semua' | 'Makanan' | 'Minuman' | 'Cemilan'>('Semua');
 
   useEffect(() => {
-    // 1. Cek URL Hash untuk Auto-Direct Admin Master
     const checkAdminHash = () => {
       if (window.location.hash === '#adminmaster991') {
         setIsAdminOpen(true);
-        // Optional: Hilangkan hash dari URL agar rapi (tapi dashboard tetap terbuka)
-        // window.history.replaceState(null, '', window.location.pathname);
       }
     };
 
-    // 2. Load dari local storage untuk Master View
     const savedConfig = localStorage.getItem('batachi_master_config');
     const savedMenu = localStorage.getItem('batachi_master_menu');
     if (savedConfig) setConfig(JSON.parse(savedConfig));
     if (savedMenu) setMenuItems(JSON.parse(savedMenu));
 
     checkAdminHash();
-    // Monitor hash change juga seandainya user mengetik hash saat tab sudah terbuka
     window.addEventListener('hashchange', checkAdminHash);
 
     const timer = setTimeout(() => setLoading(false), 2000);
@@ -437,25 +639,7 @@ const App: React.FC = () => {
             onOpenCart={() => setIsCartOpen(true)}
           />
           
-          <section id="home" className="relative h-screen flex items-center justify-center px-6 overflow-hidden">
-            <div className="absolute inset-0 z-0">
-              <img src={config.bannerImage} className="w-full h-full object-cover opacity-40 scale-110" alt="Hero" />
-              <div className="absolute inset-0 bg-gradient-to-t from-dark via-dark/30 to-transparent"></div>
-              <div className="absolute inset-0 bg-black/40"></div>
-            </div>
-            <div className="relative z-10 text-center">
-              <div className="inline-block px-4 py-1.5 border border-secondary/30 bg-secondary/10 rounded-full mb-8">
-                 <span className="text-secondary font-black tracking-[0.4em] text-[8px] md:text-[10px] uppercase italic">{config.tagline}</span>
-              </div>
-              <h2 className="text-6xl md:text-[11rem] font-black mb-10 leading-[0.8] tracking-tighter uppercase italic drop-shadow-2xl">
-                Luxury <br /><span className="text-primary not-italic">Homemade.</span>
-              </h2>
-              <div className="flex flex-col sm:flex-row gap-5 justify-center mt-12">
-                <button onClick={() => scrollToSection('menu')} className="px-14 py-6 bg-secondary text-dark font-black rounded-[2rem] uppercase text-[10px] tracking-widest hover:scale-105 transition shadow-2xl">Pesan Sekarang</button>
-                <button onClick={() => scrollToSection('kontak')} className="px-14 py-6 border border-white/20 font-black rounded-[2rem] uppercase text-[10px] tracking-widest glassmorphism hover:bg-white/5 transition">Lokasi Kami</button>
-              </div>
-            </div>
-          </section>
+          <HeroSlider menuItems={menuItems} />
 
           <section id="menu" className="py-40 px-6 container mx-auto">
              <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
