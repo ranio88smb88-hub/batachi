@@ -17,6 +17,10 @@
     <!-- SEO -->
     <meta name="description" content="Warung Batachi menyajikan masakan rumahan dengan rasa juara yang bikin nagih. Pesan sekarang melalui APK Web kami.">
     
+    <!-- GSAP for Slider -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/CustomEase.min.js"></script>
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -31,6 +35,7 @@
             },
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
+              display: ['Montserrat', 'sans-serif'],
             },
             animation: {
               'fade-in': 'fadeIn 0.5s ease-out forwards',
@@ -47,7 +52,7 @@
       }
     </script>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Montserrat:wght@700;900&display=swap');
       
       body {
         background-color: #121212;
@@ -98,23 +103,183 @@
         background: rgba(255,255,255,0.1);
         border-radius: 10px;
       }
+
+      /* Slider Specific Styles */
+      .slider-container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        background: #000;
+      }
+      .slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .slide-bg-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        will-change: clip-path;
+      }
+      .slide-bg-img::after {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+      }
+      .slide-bg-img img {
+        width: 100%; height: 100%; object-fit: cover;
+      }
+      .slide-main-img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 35%;
+        height: 50%;
+        z-index: 2;
+        box-shadow: 0 30px 60px -12px rgba(0,0,0,0.5);
+      }
+      .slide-main-img-wrapper {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        will-change: clip-path;
+      }
+      .slide-main-img img {
+        width: 100%; height: 100%; object-fit: cover;
+      }
+      
+      /* SLIDE COPY - REVISED FOR NO OVERLAP */
+      .slide-copy {
+        position: absolute;
+        top: 50%;
+        left: 10%;
+        transform: translateY(-50%);
+        color: #fff;
+        z-index: 10;
+        width: 80%;
+        pointer-events: none;
+      }
+      .slide-copy button {
+        pointer-events: auto;
+      }
+      
+      .slide-title {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+        /* Biarkan tinggi otomatis */
+        display: flex;
+        flex-direction: column;
+      }
+      .slide-title h1 {
+        font-family: 'Montserrat', sans-serif;
+        font-size: clamp(1.8rem, 8vw, 4.2rem);
+        font-weight: 900;
+        line-height: 1;
+        text-transform: uppercase;
+        font-style: italic;
+        width: 100%;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        display: block;
+      }
+      /* Untuk menumpuk h1 saat animasi tanpa merusak layout */
+      .slide-title h1:not(:first-child) {
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+
+      .slide-description {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        height: 1.6em;
+        margin-bottom: 2rem;
+      }
+      .slide-description p {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        font-size: clamp(0.7rem, 2.5vw, 1.1rem);
+        font-weight: 700;
+        letter-spacing: 0.4em;
+        text-transform: uppercase;
+        color: #D4AF37;
+      }
+
+      .slider-footer {
+        position: absolute;
+        bottom: 3rem;
+        left: 3rem;
+        right: 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 20;
+      }
+      .slider-counter {
+        display: flex;
+        font-size: 1rem;
+        font-weight: 700;
+      }
+      .slider-counter .count {
+        position: relative;
+        width: 1.5rem;
+        height: 1.25rem;
+        clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+        overflow: hidden;
+      }
+      .slider-counter .count p {
+        position: absolute;
+      }
+
+      @media (max-width: 900px) {
+        .slide-main-img {
+          width: 80%;
+          height: 35%;
+        }
+        .slide-copy {
+          left: 50%;
+          top: 75%;
+          transform: translateX(-50%);
+          text-align: center;
+          width: 90%;
+        }
+        .slide-title h1 {
+          font-size: clamp(1.5rem, 10vw, 2.5rem);
+        }
+      }
     </style>
 <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@^19.2.4",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/"
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4"
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
     <script>
-      // Register Service Worker for PWA functionality
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
@@ -123,6 +288,5 @@
         });
       }
     </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
